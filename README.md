@@ -101,7 +101,7 @@ Follow these instructions to set up and run the project locally.
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/your-username/qiskit_demo.git](https://github.com/neostrange/qiskit-lab.git) # Replace with your actual repo URL
+    git clone https://github.com/neostrange/qiskit-lab.git
     cd qiskit_demo
     ```
 
