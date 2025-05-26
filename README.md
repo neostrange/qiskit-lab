@@ -50,7 +50,7 @@ This interactive demonstration aims to find the **optimal schedule for charging 
 
 The project is structured to separate concerns, making it modular and easier to understand:
 
-
+```
 ├── analysis/
 │   └── solution_analyzer.py      # Logic for analyzing and comparing optimization solutions
 ├── app.py                        # Main Flask application file defining API routes
@@ -71,7 +71,7 @@ The project is structured to separate concerns, making it modular and easier to 
 │   └── index.html                # The main frontend HTML file (user interface)
 └── utils/
 └── problem_data_generator.py # Utility functions for generating random problem data
-
+```
 
 * **`app.py`**: The core Flask application defining the API endpoints.
 * **`config.yaml`**: Stores default and user-modifiable parameters for the energy problem and QAOA.
