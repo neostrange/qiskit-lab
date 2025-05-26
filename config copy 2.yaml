@@ -1,0 +1,36 @@
+problem_parameters:
+  battery_capacity: 3.0
+  battery_efficiency: 1.0
+  battery_initial_charge: 1.0
+  battery_max_exchange: 1.0
+  buy_price:
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  load:
+  - 5.0
+  - 5.0
+  - 5.0
+  - 5.0
+  num_slots: 4
+  penalty_factor: 100000.0
+  sell_price:
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  solar:
+  - 4.0
+  - 4.0
+  - 4.0
+  - 4.0
+qaoa_classical_optimizer:
+  name: SPSA
+  parameters:
+    maxiter: 1000
+qaoa_parameters:
+  reps: 5
+random_data_generation:
+  generate_random_data: true
+  random_seed: null

@@ -1,0 +1,42 @@
+# General Simulation Settings
+simulation_settings:
+  num_slots: 2
+  skip_classical: false
+  skip_quantum: false
+  qaoa_reps: 50
+  verbose_classical_trace: false
+
+  # NEW: Configure QAOA classical optimizer parameters
+  qaoa_classical_optimizer:
+    name: SPSA # Default optimizer name
+    parameters:
+      maxiter: 1000 # Default max iterations for SPSA (increase from 500)
+      # You can add other SPSA parameters here, e.g., 'trust_region': True
+      # For COBYLA, you might add 'tol', 'rhobeg' etc.
+      # For L_BFGS_B, 'maxfun', 'ftol' etc.
+
+# Problem Parameters (used if generate_random_data is false)
+problem_parameters:
+  load: [5.0, 3.0]
+  solar: [4.0, 2.0]
+  buy_price: [0.20, 0.30]
+  sell_price: [0.10, 0.15]
+  battery_capacity: 3.0
+  battery_initial_charge: 1.0
+  battery_max_exchange: 1.0
+  battery_efficiency: 1.0
+  penalty_factor: 1000.0
+
+# Random Data Generation Settings
+random_data_generation:
+  generate_random_data: false
+  random_seed: null
+
+  base_load: 5.0
+  load_variance: 1.0
+  base_solar: 3.0
+  solar_variance: 0.5
+  base_buy_price: 0.25
+  buy_price_variance: 0.05
+  base_sell_price: 0.15
+  sell_price_variance: 0.02

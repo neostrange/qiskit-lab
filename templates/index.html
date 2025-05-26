@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum-Classical Energy Optimization Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body { font-family: sans-serif; padding-bottom: 100px; }
+        .tab-content { border: 1px solid #dee2e6; border-top: none; padding: 1.5rem; }
+        pre { background-color: #f8f9fa; padding: 1rem; border-radius: 0.25rem; max-height: 400px; overflow-y: auto;}
+        .form-label { font-weight: 500; }
+        .section-title { margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 2px solid #0d6efd; padding-bottom: 0.5rem;}
+        textarea { font-family: monospace; }
+        .status-message { margin-top: 10px; }
+        .api-response-area { margin-top: 15px; }
+        .nav-tabs .nav-link { cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h1>Quantum vs. Classical Optimization for Energy Management</h1>
+            <p class="lead">A demonstration of applying different algorithmic approaches to optimize battery usage in a microgrid.</p>
+        </header>
+
+        <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">1. Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="config-tab-btn" data-bs-toggle="tab" data-bs-target="#config" type="button" role="tab" aria-controls="config" aria-selected="false">2. Configuration</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="problem-tab" data-bs-toggle="tab" data-bs-target="#problem" type="button" role="tab" aria-controls="problem" aria-selected="false">3. Define Problem</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="run-tab" data-bs-toggle="tab" data-bs-target="#run" type="button" role="tab" aria-controls="run" aria-selected="false">4. Run Optimization</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="api-utils-tab" data-bs-toggle="tab" data-bs-target="#api-utils" type="button" role="tab" aria-controls="api-utils" aria-selected="false">5. API Utilities</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="mainTabsContent">
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                <h3 class="section-title">Project Overview</h3>
+                <p><strong>The Challenge: Efficient Energy Management</strong></p>
+                <p>Modern energy systems, especially at the microgrid level (like a home with solar panels and a battery, or a small community grid), face a complex challenge: how to use available resources most efficiently. This involves balancing energy generation (e.g., from solar), energy demand (load), energy storage (batteries), and interaction with the main power grid (buying or selling electricity). Prices for buying and selling electricity often change throughout the day, adding another layer of complexity.</p>
+
+                <p><strong>Purpose of This Demonstration:</strong></p>
+                <p>This interactive demo showcases how optimization algorithms can tackle this energy management problem. We aim to find the best schedule for charging and discharging a battery to minimize overall energy costs. We explore and compare two main approaches:</p>
+                <ul>
+                    <li><strong>Classical Optimization:</strong> Using traditional algorithms that run on current computers. For small-scale problems, we can find the absolute best solution by checking every possibility (exhaustive search).</li>
+                    <li><strong>Quantum-Inspired & Quantum Optimization:</strong> Exploring algorithms designed for or inspired by quantum computers. Here, we formulate the problem as a Quadratic Unconstrained Binary Optimization (QUBO) problem and use the Quantum Approximate Optimization Algorithm (QAOA) run on a simulator. While true quantum advantage for this specific problem size is not expected on current hardware, this demonstrates the methodology and potential for future, more powerful quantum devices to solve much larger and more complex versions.</li>
+                </ul>
+
+                <p><strong>Our Strategy:</strong></p>
+                <ol>
+                    <li><strong>Model the Problem:</strong> Define all parameters like load, solar generation, grid prices, battery capacity, efficiency, and constraints.</li>
+                    <li><strong>Classical Approach:</strong> Implement an exhaustive search algorithm. This is guaranteed to find the optimal solution for small problems, serving as our benchmark. We acknowledge this method doesn't scale to large numbers of time slots.</li>
+                    <li><strong>Quantum Approach (QAOA):</strong>
+                        <ul>
+                            <li>Convert the problem into a QUBO: This means expressing the total cost (including penalties for violating constraints like battery capacity) as a quadratic polynomial of binary variables (charge/discharge decisions). This step is critical and often challenging.</li>
+                            <li>Use QAOA: This hybrid quantum-classical algorithm uses a quantum computer (or simulator) to prepare and measure quantum states, and a classical computer to optimize the parameters of the quantum operations to find a low-cost solution.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Compare:</strong> Evaluate the solutions and costs found by both methods.</li>
+                </ol>
+
+                <p><strong>Potential Use Cases:</strong></p>
+                <ul>
+                    <li>Smart home energy systems for minimizing electricity bills.</li>
+                    <li>Optimizing battery fleets for grid stabilization services.</li>
+                    <li>Energy management for commercial buildings or industrial facilities.</li>
+                    <li>Community microgrids balancing local generation and shared storage.</li>
+                </ul>
+
+                <p><strong>How to Use This Demo:</strong></p>
+                <ol>
+                    <li><strong>Overview (Here!):</strong> Understand the basics.</li>
+                    <li><strong>Configuration Tab:</strong> View and modify the parameters for the problem (e.g., battery size, penalty factors) and the QAOA algorithm (e.g., number of repetitions). You can update these settings on the server.</li>
+                    <li><strong>Define Problem Tab:</strong> Choose to use the problem parameters from the server's configuration, generate a new random problem, or manually input data for load, solar, and prices.</li>
+                    <li><strong>Run Optimization Tab:</strong> Execute the classical and quantum optimizers using the active problem data and configuration. Results will be displayed, showing schedules and costs.</li>
+                    <li><strong>API Utilities Tab:</strong> Interact with some of the backend's helper API endpoints to see status, configuration structure, or validate parameters.</li>
+                </ol>
+                <p><em>Note: The quantum optimization is run on a classical simulator. Performance on actual quantum hardware would differ and is subject to current device limitations (noise, qubit count).</em></p>
+            </div>
+
+            <div class="tab-pane fade" id="config" role="tabpanel" aria-labelledby="config-tab-btn">
+                <h3 class="section-title">Backend Configuration Management (<code id="configFilePath">config.yaml</code>)</h3>
+                <div class="mb-3">
+                    <button class="btn btn-info btn-sm me-2" onclick="fetchConfig()">Fetch Current Config</button>
+                    <button class="btn btn-danger btn-sm me-2" onclick="resetConfig()">Reset Config to Default</button>
+                    <button class="btn btn-success btn-sm me-2" onclick="downloadConfig()">Download Config File</button>
+                    <label for="uploadConfigFile" class="btn btn-warning btn-sm">Upload Config File</label>
+                    <input type="file" id="uploadConfigFile" class="d-none" accept=".yaml,.yml" onchange="uploadConfig(event)">
+                </div>
+                
+                <form id="configForm">
+                    <h4 class="mt-4">Problem Parameters</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="config_num_slots" class="form-label">Number of Slots:</label>
+                            <input type="number" class="form-control" id="config_num_slots" name="problem_parameters.num_slots" min="1" value="2">
+                        </div>
+                         <div class="col-md-3 mb-3">
+                            <label for="config_battery_capacity" class="form-label">Battery Capacity (kWh):</label>
+                            <input type="number" class="form-control" id="config_battery_capacity" name="problem_parameters.battery_capacity" step="0.1" value="3.0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="config_battery_initial_charge" class="form-label">Initial Charge (kWh):</label>
+                            <input type="number" class="form-control" id="config_battery_initial_charge" name="problem_parameters.battery_initial_charge" step="0.1" value="1.0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="config_battery_max_exchange" class="form-label">Max Exchange (kWh/slot):</label>
+                            <input type="number" class="form-control" id="config_battery_max_exchange" name="problem_parameters.battery_max_exchange" step="0.1" value="1.0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="config_battery_efficiency" class="form-label">Battery Efficiency (0-1):</label>
+                            <input type="number" class="form-control" id="config_battery_efficiency" name="problem_parameters.battery_efficiency" step="0.01" min="0" max="1" value="1.0">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="config_penalty_factor" class="form-label">Penalty Factor:</label>
+                            <input type="number" class="form-control" id="config_penalty_factor" name="problem_parameters.penalty_factor" step="1000" value="100000.0">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="config_load" class="form-label">Load (kWh, comma-separated):</label>
+                        <input type="text" class="form-control" id="config_load" name="problem_parameters.load" placeholder="e.g., 5.0,3.0">
+                    </div>
+                     <div class="mb-3">
+                        <label for="config_solar" class="form-label">Solar (kWh, comma-separated):</label>
+                        <input type="text" class="form-control" id="config_solar" name="problem_parameters.solar" placeholder="e.g., 4.0,2.0">
+                    </div>
+                     <div class="mb-3">
+                        <label for="config_buy_price" class="form-label">Buy Price ($/kWh, comma-separated):</label>
+                        <input type="text" class="form-control" id="config_buy_price" name="problem_parameters.buy_price" placeholder="e.g., 0.20,0.30">
+                    </div>
+                     <div class="mb-3">
+                        <label for="config_sell_price" class="form-label">Sell Price ($/kWh, comma-separated):</label>
+                        <input type="text" class="form-control" id="config_sell_price" name="problem_parameters.sell_price" placeholder="e.g., 0.10,0.15">
+                    </div>
+
+                    <h4 class="mt-4">Random Data Generation</h4>
+                     <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="config_generate_random_data" name="random_data_generation.generate_random_data">
+                        <label class="form-check-label" for="config_generate_random_data">
+                            Generate Random Problem Data for Runs? (Overrides above Load/Solar/Prices if checked)
+                        </label>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="config_random_seed" class="form-label">Random Seed (optional):</label>
+                        <input type="number" class="form-control" id="config_random_seed" name="random_data_generation.random_seed" placeholder="Leave blank for no seed">
+                    </div>
+                    <h4 class="mt-4">QAOA Parameters</h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="config_qaoa_reps" class="form-label">QAOA Repetitions (p):</label>
+                            <input type="number" class="form-control" id="config_qaoa_reps" name="qaoa_parameters.reps" min="1" value="5">
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-3">QAOA Classical Optimizer</h5>
+                     <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="config_qaoa_optimizer_name" class="form-label">Optimizer Name:</label>
+                            <select class="form-select" id="config_qaoa_optimizer_name" name="qaoa_classical_optimizer.name">
+                                <option value="SPSA">SPSA</option>
+                                <option value="COBYLA">COBYLA</option>
+                                <option value="NELDER_MEAD">NELDER_MEAD</option>
+                            </select>
+                        </div>
+                         <div class="col-md-4 mb-3">
+                            <label for="config_qaoa_optimizer_maxiter" class="form-label">Max Iterations:</label>
+                            <input type="number" class="form-control" id="config_qaoa_optimizer_maxiter" name="qaoa_classical_optimizer.parameters.maxiter" min="1" value="1000">
+                        </div>
+                        </div>
+                    <button type="button" class="btn btn-primary" onclick="updateConfig()">Update Config on Server</button>
+                </form>
+                <div id="configStatus" class="status-message"></div>
+                <h5 class="mt-4">Current Config Data (Raw JSON):</h5>
+                <pre id="configDisplay"></pre>
+            </div>
+
+            <div class="tab-pane fade" id="problem" role="tabpanel" aria-labelledby="problem-tab">
+                <h3 class="section-title">Define Active Problem for Optimization Run</h3>
+                <p>The settings here determine the specific problem instance (load, solar, prices) that will be used when you click "Run Optimization". Battery parameters, penalty factor, and QAOA settings are taken from the current server configuration (see Configuration tab).</p>
+
+                <div class="accordion" id="problemDefinitionAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Option 1: Use Problem Parameters from Current Server Configuration
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#problemDefinitionAccordion">
+                            <div class="accordion-body">
+                                <p>This will use the <code>num_slots</code>, <code>load</code>, <code>solar</code>, <code>buy_price</code>, and <code>sell_price</code> arrays as currently saved in the server's <code>config.yaml</code> file. If "Generate Random Problem Data" is checked in the Configuration tab, new random data will be generated by the server for these arrays before the run.</p>
+                                <button class="btn btn-info btn-sm" onclick="setActiveProblemSource('server_config')">Select & View Server Problem Params</button>
+                                <div class="mt-2"><strong>Current Server Problem Parameters:</strong></div>
+                                <pre id="serverProblemParamsDisplay">(Click button to load)</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Option 2: Generate and Use New Random Problem Data
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#problemDefinitionAccordion">
+                            <div class="accordion-body">
+                                <p>Generates new random load, solar, and price data. Specify the number of time slots below.</p>
+                                <div class="row g-3 align-items-center mb-3">
+                                    <div class="col-auto">
+                                        <label for="random_problem_num_slots" class="col-form-label">Number of Slots:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="number" id="random_problem_num_slots" class="form-control form-control-sm" value="4" min="1" style="width: 80px;">
+                                    </div>
+                                    <div class="col-auto">
+                                        <button class="btn btn-success btn-sm" onclick="generateAndDisplayRandomProblem()">Generate New Random Data</button>
+                                    </div>
+                                </div>
+                                <div class="mt-2"><strong>Generated Random Data:</strong></div>
+                                <pre id="generatedRandomProblemDisplay">(Click button to generate)</pre>
+                                <button class="btn btn-primary btn-sm mt-2" onclick="setActiveProblemSource('generated_random')" id="useGeneratedRandomBtn" style="display:none;">Use These Generated Random Values</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Option 3: Define Manual Problem Data
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#problemDefinitionAccordion">
+                            <div class="accordion-body">
+                                <form id="manualProblemForm">
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label for="manual_num_slots" class="form-label">Number of Slots:</label>
+                                            <input type="number" class="form-control" id="manual_num_slots" value="2" min="1">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="manual_load" class="form-label">Load (kWh, comma-separated):</label>
+                                        <input type="text" class="form-control" id="manual_load" placeholder="e.g., 5.0,3.0">
+                                    </div>
+                                     <div class="mb-3">
+                                        <label for="manual_solar" class="form-label">Solar (kWh, comma-separated):</label>
+                                        <input type="text" class="form-control" id="manual_solar" placeholder="e.g., 4.0,2.0">
+                                    </div>
+                                     <div class="mb-3">
+                                        <label for="manual_buy_price" class="form-label">Buy Price ($/kWh, comma-separated):</label>
+                                        <input type="text" class="form-control" id="manual_buy_price" placeholder="e.g., 0.20,0.30">
+                                    </div>
+                                     <div class="mb-3">
+                                        <label for="manual_sell_price" class="form-label">Sell Price ($/kWh, comma-separated):</label>
+                                        <input type="text" class="form-control" id="manual_sell_price" placeholder="e.g., 0.10,0.15">
+                                    </div>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="setActiveProblemSource('manual')">Use These Manual Values</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h4 class="mt-3">Currently Active Problem Data for Next Optimization Run:</h4>
+                <pre id="activeProblemDisplay">(Select an option above to populate)</pre>
+                <div id="problemStatus" class="status-message"></div>
+            </div>
+
+            <div class="tab-pane fade" id="run" role="tabpanel" aria-labelledby="run-tab">
+                <h3 class="section-title">Execute Optimization</h3>
+                <p>This will run both classical and quantum optimizers on the backend using the "Currently Active Problem Data" (from "Define Problem" tab) and the current server-side configuration for battery parameters, penalty factor, and QAOA settings (from "Configuration" tab).</p>
+                
+                <button class="btn btn-lg btn-primary me-2" onclick="runOptimizationWithServerConfig()">Run with Active Problem & Server Config</button>
+                <button class="btn btn-lg btn-warning" onclick="runOptimizationWithCustomConfig()">Run with Active Problem & UI Config (Advanced)</button>
+                <p class="form-text mt-1">"UI Config" uses all settings (problem params, QAOA, random data flags) currently specified in the "Configuration" tab fields and sends them for a one-time run.</p>
+                
+                <div id="runStatus" class="status-message mt-3"></div>
+
+                <h4 class="section-title mt-4">Optimization Results</h4>
+                <button class="btn btn-info btn-sm mb-2" onclick="fetchLastResult()">Fetch Last Stored Result</button>
+                <button class="btn btn-danger btn-sm mb-2" onclick="clearLastResult()">Clear Stored Result</button>
+
+                <div id="resultsDisplay" class="api-response-area">
+                    <p><em>Results will appear here after running an optimization or fetching the last result.</em></p>
+                </div>
+                <h5 class="mt-3">Raw JSON Response:</h5>
+                <pre id="rawResultOutput"></pre>
+            </div>
+
+            <div class="tab-pane fade" id="api-utils" role="tabpanel" aria-labelledby="api-utils-tab">
+                <h3 class="section-title">API Utilities & Diagnostics</h3>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Server Status</h5>
+                        <button class="btn btn-secondary btn-sm" onclick="fetchServerStatus()">Get Server Status</button>
+                        <pre id="statusOutput" class="mt-2"></pre>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Configuration File Keys</h5>
+                        <button class="btn btn-secondary btn-sm" onclick="fetchConfigKeys()">Get Top-Level Config Keys</button>
+                        <pre id="configKeysOutput" class="mt-2"></pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Validate Problem Parameters (Example)</h5>
+                        <form id="validateParamsForm">
+                            <div class="mb-2">
+                                <label for="validate_num_slots" class="form-label">Num Slots:</label>
+                                <input type="number" class="form-control form-control-sm" id="validate_num_slots" value="2">
+                            </div>
+                            <div class="mb-2">
+                                <label for="validate_load" class="form-label">Load (comma-sep):</label>
+                                <input type="text" class="form-control form-control-sm" id="validate_load" value="5,3">
+                            </div>
+                             <div class="mb-2">
+                                <label for="validate_solar" class="form-label">Solar (comma-sep):</label>
+                                <input type="text" class="form-control form-control-sm" id="validate_solar" value="4,2">
+                            </div>
+                             <div class="mb-2">
+                                <label for="validate_buy_price" class="form-label">Buy Price (comma-sep):</label>
+                                <input type="text" class="form-control form-control-sm" id="validate_buy_price" value="0.2,0.3">
+                            </div>
+                             <div class="mb-2">
+                                <label for="validate_sell_price" class="form-label">Sell Price (comma-sep):</label>
+                                <input type="text" class="form-control form-control-sm" id="validate_sell_price" value="0.1,0.15">
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="validateProblemParams()">Validate Parameters</button>
+                        </form>
+                        <pre id="validationOutput" class="mt-2"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        const API_BASE_URL = 'http://localhost:5000'; // Adjust if your backend runs elsewhere
+
+        // --- State Management for Active Problem ---
+        let activeProblemData = null; // Will store { num_slots, load, solar, buy_price, sell_price }
+        let activeProblemSourceType = 'server_config'; // 'server_config', 'generated_random', 'manual'
+
+        // --- Helper for API calls ---
+        async function fetchAPI(endpoint, options = {}) {
+            const displayAreaId = options.displayAreaId || 'apiStatusGeneral'; // A general status area if needed
+            const statusEl = document.getElementById(displayAreaId);
+            // if (statusEl) statusEl.textContent = `Workspaceing ${endpoint}...`;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ error: `HTTP error! status: ${response.status}` }));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                if (options.responseType === 'file') {
+                    return response; // For file download
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Error fetching ${endpoint}:`, error);
+                // if (statusEl) statusEl.textContent = `Error: ${error.message}`;
+                throw error; // Re-throw to be caught by specific handlers
+            }
+        }
+        
+        function displayJSON(elementId, data, successMessage = null) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = JSON.stringify(data, null, 2);
+                if (successMessage && data.message) { // If backend sends a message, prioritize it
+                     el.previousElementSibling?.insertAdjacentHTML('afterend', `<div class="alert alert-success alert-dismissible fade show mt-2" role="alert">${data.message}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
+                } else if (successMessage) {
+                     el.previousElementSibling?.insertAdjacentHTML('afterend', `<div class="alert alert-success alert-dismissible fade show mt-2" role="alert">${successMessage}<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>`);
+                }
+            }
+        }
+
+        function displayStatusMessage(elementId, message, isError = false) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.textContent = message;
+                el.className = `status-message alert ${isError ? 'alert-danger' : 'alert-success'}`;
+            }
+        }
+        
+        function stringToArray(str) {
+            if (!str || typeof str !== 'string') return [];
+            return str.split(',').map(item => parseFloat(item.trim())).filter(item => !isNaN(item));
+        }
+
+        function arrayToString(arr) {
+            if (!arr || !Array.isArray(arr)) return "";
+            return arr.join(',');
+        }
+
+        // --- Configuration Tab Functions ---
+        async function fetchConfig() {
+            try {
+                const config = await fetchAPI('/api/config');
+                populateConfigForm(config);
+                displayJSON('configDisplay', config, "Config fetched successfully.");
+                displayStatusMessage('configStatus', 'Config loaded from server.', false);
+            } catch (e) {
+                displayStatusMessage('configStatus', `Error fetching config: ${e.message}`, true);
+            }
+        }
+
+        function populateConfigForm(config) {
+            // Problem Parameters
+            document.getElementById('config_num_slots').value = config.problem_parameters?.num_slots || 2;
+            document.getElementById('config_battery_capacity').value = config.problem_parameters?.battery_capacity || 3.0;
+            document.getElementById('config_battery_initial_charge').value = config.problem_parameters?.battery_initial_charge || 1.0;
+            document.getElementById('config_battery_max_exchange').value = config.problem_parameters?.battery_max_exchange || 1.0;
+            document.getElementById('config_battery_efficiency').value = config.problem_parameters?.battery_efficiency || 1.0;
+            document.getElementById('config_penalty_factor').value = config.problem_parameters?.penalty_factor || 100000.0;
+            document.getElementById('config_load').value = arrayToString(config.problem_parameters?.load);
+            document.getElementById('config_solar').value = arrayToString(config.problem_parameters?.solar);
+            document.getElementById('config_buy_price').value = arrayToString(config.problem_parameters?.buy_price);
+            document.getElementById('config_sell_price').value = arrayToString(config.problem_parameters?.sell_price);
+            
+            // Random Data Generation
+            document.getElementById('config_generate_random_data').checked = config.random_data_generation?.generate_random_data || false;
+            document.getElementById('config_random_seed').value = config.random_data_generation?.random_seed === null ? '' : config.random_data_generation?.random_seed;
+
+
+            // QAOA Parameters
+            document.getElementById('config_qaoa_reps').value = config.qaoa_parameters?.reps || 5;
+            document.getElementById('config_qaoa_optimizer_name').value = config.qaoa_classical_optimizer?.name || 'SPSA';
+            document.getElementById('config_qaoa_optimizer_maxiter').value = config.qaoa_classical_optimizer?.parameters?.maxiter || 1000;
+        }
+
+        function getConfigFromForm() {
+            const numSlots = parseInt(document.getElementById('config_num_slots').value);
+            const config = {
+                problem_parameters: {
+                    num_slots: numSlots,
+                    battery_capacity: parseFloat(document.getElementById('config_battery_capacity').value),
+                    battery_initial_charge: parseFloat(document.getElementById('config_battery_initial_charge').value),
+                    battery_max_exchange: parseFloat(document.getElementById('config_battery_max_exchange').value),
+                    battery_efficiency: parseFloat(document.getElementById('config_battery_efficiency').value),
+                    penalty_factor: parseFloat(document.getElementById('config_penalty_factor').value),
+                    load: stringToArray(document.getElementById('config_load').value),
+                    solar: stringToArray(document.getElementById('config_solar').value),
+                    buy_price: stringToArray(document.getElementById('config_buy_price').value),
+                    sell_price: stringToArray(document.getElementById('config_sell_price').value),
+                },
+                random_data_generation: {
+                    generate_random_data: document.getElementById('config_generate_random_data').checked,
+                    random_seed: document.getElementById('config_random_seed').value ? parseInt(document.getElementById('config_random_seed').value) : null,
+                },
+                qaoa_parameters: {
+                    reps: parseInt(document.getElementById('config_qaoa_reps').value),
+                },
+                qaoa_classical_optimizer: {
+                    name: document.getElementById('config_qaoa_optimizer_name').value,
+                    parameters: {
+                        maxiter: parseInt(document.getElementById('config_qaoa_optimizer_maxiter').value),
+                    }
+                }
+            };
+            // Validate array lengths against num_slots
+            ['load', 'solar', 'buy_price', 'sell_price'].forEach(key => {
+                if (config.problem_parameters[key].length !== numSlots && !config.random_data_generation.generate_random_data) {
+                     displayStatusMessage('configStatus', `Error: ${key} array length must match Number of Slots (${numSlots}) if not generating random data.`, true);
+                    throw new Error("Array length mismatch for " + key);
+                }
+            });
+            return config;
+        }
+
+
+        async function updateConfig() {
+            try {
+                const configData = getConfigFromForm(); // Helper to get data from all form fields
+                const response = await fetchAPI('/api/update-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(configData)
+                });
+                displayJSON('configDisplay', response.config, response.message);
+                displayStatusMessage('configStatus', response.message || 'Config updated successfully.', false);
+            } catch (e) {
+                displayStatusMessage('configStatus', `Error updating config: ${e.message}`, true);
+            }
+        }
+
+        async function resetConfig() {
+            try {
+                if (!confirm("Are you sure you want to reset the configuration to default values?")) return;
+                const response = await fetchAPI('/api/reset', { method: 'POST' });
+                populateConfigForm(response.config);
+                displayJSON('configDisplay', response.config, response.message);
+                displayStatusMessage('configStatus', response.message || 'Config reset to default.', false);
+            } catch (e) {
+                displayStatusMessage('configStatus', `Error resetting config: ${e.message}`, true);
+            }
+        }
+        
+        async function downloadConfig() {
+            try {
+                const response = await fetchAPI('/api/config/download', { responseType: 'file' });
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = 'config.yaml';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+                displayStatusMessage('configStatus', 'Config file download initiated.', false);
+            } catch (e) {
+                displayStatusMessage('configStatus', `Error downloading config: ${e.message}`, true);
+            }
+        }
+
+        async function uploadConfig(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const response = await fetchAPI('/api/config/upload', {
+                    method: 'POST',
+                    body: formData
+                    // No Content-Type header for FormData, browser sets it with boundary
+                });
+                await fetchConfig(); // Refresh displayed config
+                displayStatusMessage('configStatus', response.message || 'Config uploaded and saved successfully.', false);
+            } catch (e) {
+                displayStatusMessage('configStatus', `Error uploading config: ${e.message}`, true);
+            }
+            event.target.value = null; // Reset file input
+        }
+
+
+        // --- Define Problem Tab Functions ---
+        async function setActiveProblemSource(sourceType) {
+            activeProblemSourceType = sourceType;
+            document.getElementById('activeProblemDisplay').textContent = 'Fetching active problem data...';
+            let problemToDisplay = { note: `Source type: ${sourceType}` };
+
+            try {
+                if (sourceType === 'server_config') {
+                    const config = await fetchAPI('/api/config');
+                    const pp = config.problem_parameters;
+                    activeProblemData = {
+                        num_slots: pp.num_slots,
+                        load: pp.load,
+                        solar: pp.solar,
+                        buy_price: pp.buy_price,
+                        sell_price: pp.sell_price
+                        // Other battery params will be pulled from server config at runtime
+                    };
+                    problemToDisplay = activeProblemData;
+                    document.getElementById('serverProblemParamsDisplay').textContent = JSON.stringify(activeProblemData, null, 2);
+
+                } else if (sourceType === 'generated_random') {
+                    const randomData = JSON.parse(document.getElementById('generatedRandomProblemDisplay').textContent);
+                     activeProblemData = { // Assuming random-problem returns these keys
+                        num_slots: randomData.load.length, // Infer from data
+                        load: randomData.load,
+                        solar: randomData.solar,
+                        buy_price: randomData.buy_price,
+                        sell_price: randomData.sell_price
+                    };
+                    problemToDisplay = activeProblemData;
+                } else if (sourceType === 'manual') {
+                    const num_slots = parseInt(document.getElementById('manual_num_slots').value);
+                    activeProblemData = {
+                        num_slots: num_slots,
+                        load: stringToArray(document.getElementById('manual_load').value),
+                        solar: stringToArray(document.getElementById('manual_solar').value),
+                        buy_price: stringToArray(document.getElementById('manual_buy_price').value),
+                        sell_price: stringToArray(document.getElementById('manual_sell_price').value),
+                    };
+                    // Basic validation for manual arrays
+                     ['load', 'solar', 'buy_price', 'sell_price'].forEach(key => {
+                        if (activeProblemData[key].length !== num_slots) {
+                            displayStatusMessage('problemStatus', `Error: Manual ${key} array length must match Number of Slots (${num_slots}).`, true);
+                            throw new Error("Manual array length mismatch for " + key);
+                        }
+                    });
+                    problemToDisplay = activeProblemData;
+                }
+                displayJSON('activeProblemDisplay', problemToDisplay, "Active problem data updated.");
+                displayStatusMessage('problemStatus', `Active problem source set to: ${sourceType}.`, false);
+            } catch (e) {
+                displayJSON('activeProblemDisplay', { error: e.message }, "Error setting active problem.");
+                displayStatusMessage('problemStatus', `Error: ${e.message}`, true);
+                activeProblemData = null; // Clear on error
+            }
+        }
+
+        // Inside your index.html script
+       // --- Define Problem Tab Functions --- (Part of your existing script)
+
+        async function generateAndDisplayRandomProblem() { // Removed default parameter, will read from input
+            const problemStatusEl = document.getElementById('problemStatus');
+            try {
+                // Read the desired number of slots from the new input field
+                const numSlotsInput = document.getElementById('random_problem_num_slots');
+                const slotsToGenerate = parseInt(numSlotsInput.value);
+
+                if (isNaN(slotsToGenerate) || slotsToGenerate <= 0) {
+                    displayStatusMessage('problemStatus', 'Please enter a valid positive number for slots.', true);
+                    return;
+                }
+
+                problemStatusEl.textContent = `Generating random data for ${slotsToGenerate} slots...`;
+                problemStatusEl.className = 'status-message alert alert-info';
+
+                // Pass num_slots as a query parameter
+                const randomData = await fetchAPI(`/api/random-problem?num_slots=${slotsToGenerate}`); 
+                
+                displayJSON('generatedRandomProblemDisplay', randomData);
+                document.getElementById('useGeneratedRandomBtn').style.display = 'inline-block';
+                
+                // Update status message using the actual number of slots generated (if backend returns it)
+                const actualSlotsGenerated = randomData.num_slots_generated || slotsToGenerate;
+                displayStatusMessage('problemStatus', `New random problem data generated for ${actualSlotsGenerated} slots.`, false);
+
+            } catch (e) {
+                displayStatusMessage('problemStatus', `Error generating random problem: ${e.message}`, true);
+                document.getElementById('generatedRandomProblemDisplay').textContent = JSON.stringify({error: e.message}, null, 2);
+            }
+        }
+
+        // When setting active problem from 'generated_random', ensure num_slots is correctly inferred
+        // The setActiveProblemSource function already infers num_slots from randomData.load.length,
+        // which should be fine if your backend structures the response consistently.
+        // Let's double-check `setActiveProblemSource` for 'generated_random' part:
+
+        /* Ensure this part in setActiveProblemSource correctly handles the new num_slots:
+        } else if (sourceType === 'generated_random') {
+            const randomDataText = document.getElementById('generatedRandomProblemDisplay').textContent;
+            if (!randomDataText || randomDataText.startsWith('(') || randomDataText.includes("error")) { // Check if it's placeholder or error
+                displayStatusMessage('problemStatus', 'No valid generated random data to use.', true);
+                activeProblemData = null; // Clear if invalid
+                throw new Error('No valid generated random data.');
+            }
+            const randomData = JSON.parse(randomDataText);
+            activeProblemData = {
+                num_slots: randomData.num_slots_generated || randomData.load.length, // Prioritize num_slots_generated
+                load: randomData.load,
+                solar: randomData.solar,
+                buy_price: randomData.buy_price,
+                sell_price: randomData.sell_price
+            };
+            problemToDisplay = activeProblemData;
+        */
+        // The existing logic for `setActiveProblemSource('generated_random')` should already work if
+        // `randomData.num_slots_generated` is returned by your backend as suggested, or it will
+        // infer from `randomData.load.length`.
+
+        // You could add an input field in the UI for the user to specify num_slots for random generation:
+        // Example call from UI:
+        // const desiredSlots = document.getElementById('random_num_slots_input').value || 4;
+        // generateAndDisplayRandomProblem(desiredSlots);
+
+
+        // --- Run Optimization Tab Functions ---
+        async function runOptimization(useCustomConfig = false) {
+            document.getElementById('runStatus').textContent = 'Optimization running... please wait.';
+            document.getElementById('runStatus').className = 'status-message alert alert-info';
+            document.getElementById('resultsDisplay').innerHTML = '<p><em>Running...</em></p>';
+            document.getElementById('rawResultOutput').textContent = '';
+
+            let payload = {};
+            let endpoint = '/api/run-optimization-saved'; // Default: GET, uses server config
+            let method = 'GET';
+
+            if (useCustomConfig) {
+                try {
+                    payload = getConfigFromForm(); // Gets all config from the UI's Config tab
+                    endpoint = '/run-optimization'; // POST, uses custom config
+                    method = 'POST';
+                } catch (e) { // Catch errors from getConfigFromForm (e.g. array length mismatch)
+                    displayStatusMessage('runStatus', `Error preparing custom config: ${e.message}`, true);
+                    return;
+                }
+            } else { // Using activeProblemData with server's other configs
+                if (!activeProblemData || !activeProblemData.num_slots) {
+                     displayStatusMessage('runStatus', 'No active problem data defined. Please define a problem in Tab 3 first.', true);
+                    return;
+                }
+                 // When using /api/run-optimization-saved, it uses the config.yaml on server.
+                 // If we want to use `activeProblemData` (which might be random or manual, not yet in config.yaml)
+                 // we MUST send it via the POST /run-optimization endpoint.
+                 // So, we prepare a config payload that merges server config with active problem data.
+                const serverConfig = await fetchAPI('/api/config'); // Get current server config
+                
+                // Override problem_parameters with activeProblemData
+                serverConfig.problem_parameters.num_slots = activeProblemData.num_slots;
+                serverConfig.problem_parameters.load = activeProblemData.load;
+                serverConfig.problem_parameters.solar = activeProblemData.solar;
+                serverConfig.problem_parameters.buy_price = activeProblemData.buy_price;
+                serverConfig.problem_parameters.sell_price = activeProblemData.sell_price;
+                
+                // Ensure random generation is OFF if we're sending specific data
+                serverConfig.random_data_generation.generate_random_data = false;
+
+                payload = serverConfig;
+                endpoint = '/run-optimization';
+                method = 'POST';
+            }
+            
+            try {
+                const options = { method: method };
+                if (method === 'POST') {
+                    options.headers = { 'Content-Type': 'application/json' };
+                    options.body = JSON.stringify(payload);
+                }
+                const result = await fetchAPI(endpoint, options);
+                displayOptimizationResult(result);
+                displayStatusMessage('runStatus', 'Optimization complete!', false);
+            } catch (error) {
+                displayStatusMessage('runStatus', `Optimization error: ${error.message}`, true);
+                document.getElementById('resultsDisplay').innerHTML = `<p class="text-danger">Error: ${error.message}</p>`;
+                document.getElementById('rawResultOutput').textContent = JSON.stringify({error: error.message}, null, 2);
+            }
+        }
+        
+        function runOptimizationWithServerConfig() {
+            // This implies using server's config.yaml, including its problem_parameters
+            // UNLESS generate_random_data is true in that config.
+            // If activeProblemData is set (e.g. from manual or generated tab), it will override
+            // the problem parameters from server config.
+             if (!activeProblemData && !confirm("No specific problem data is 'active' from Tab 3. This run will use the problem data currently saved in the server's config.yaml (or generate random if configured). Continue?")) {
+                return;
+            }
+            runOptimization(false); // false means don't use UI form for full config, but use logic to merge activeProblem
+        }
+
+        function runOptimizationWithCustomConfig() {
+            runOptimization(true); // true means use all settings from UI Config Tab
+        }
+
+
+        function displayOptimizationResult(result) {
+            const resultsDiv = document.getElementById('resultsDisplay');
+            if (result.error) {
+                resultsDiv.innerHTML = `<div class="alert alert-danger">Error: ${result.error}</div>`;
+                document.getElementById('rawResultOutput').textContent = JSON.stringify(result, null, 2);
+                return;
+            }
+
+            let html = `
+                <h5>Input Parameters Used:</h5>
+                <ul>
+                    <li>Load: ${JSON.stringify(result.input?.load)}</li>
+                    <li>Solar: ${JSON.stringify(result.input?.solar)}</li>
+                    <li>Buy Prices: ${JSON.stringify(result.input?.buy_price)}</li>
+                    <li>Sell Prices: ${JSON.stringify(result.input?.sell_price)}</li>
+                </ul>
+                <hr>
+                <h5>Classical Optimizer Result:</h5>
+                <p>Charge Schedule (x_chg): ${JSON.stringify(result.classical?.x_chg)}</p>
+                <p>Discharge Schedule (x_dis): ${JSON.stringify(result.classical?.x_dis)}</p>
+                <p><strong>Cost: $${result.classical?.cost.toFixed(4)}</strong></p>
+                <hr>
+                <h5>Quantum Optimizer (QAOA) Result:</h5>
+                <p>Charge Schedule (x_chg): ${JSON.stringify(result.quantum?.x_chg)}</p>
+                <p>Discharge Schedule (x_dis): ${JSON.stringify(result.quantum?.x_dis)}</p>
+                <p><strong>Cost: $${result.quantum?.cost.toFixed(4)}</strong></p>
+                <hr>
+                <h4>Cost Difference (Classical - Quantum): $${(result.classical?.cost - result.quantum?.cost).toFixed(4)}</h4>
+                Absolute Difference: $${result.difference?.toFixed(4)}
+            `;
+            resultsDiv.innerHTML = html;
+            document.getElementById('rawResultOutput').textContent = JSON.stringify(result, null, 2);
+        }
+
+        async function fetchLastResult() {
+            try {
+                const result = await fetchAPI('/api/last-optimization-result');
+                if (result.message) { // "No optimization has been run yet."
+                    document.getElementById('resultsDisplay').innerHTML = `<p><em>${result.message}</em></p>`;
+                    document.getElementById('rawResultOutput').textContent = JSON.stringify(result, null, 2);
+                    displayStatusMessage('runStatus', result.message, false);
+                } else {
+                    displayOptimizationResult(result);
+                    displayStatusMessage('runStatus', 'Last optimization result fetched.', false);
+                }
+            } catch (e) {
+                displayStatusMessage('runStatus', `Error fetching last result: ${e.message}`, true);
+            }
+        }
+        async function clearLastResult() {
+            try {
+                const response = await fetchAPI('/api/clear-last-result', { method: 'POST' });
+                displayStatusMessage('runStatus', response.message || 'Last result cleared.', false);
+                document.getElementById('resultsDisplay').innerHTML = '<p><em>Last result cleared. Run a new optimization.</em></p>';
+                document.getElementById('rawResultOutput').textContent = '';
+            } catch (e) {
+                displayStatusMessage('runStatus', `Error clearing result: ${e.message}`, true);
+            }
+        }
+
+        // --- API Utilities Tab Functions ---
+        async function fetchServerStatus() {
+            try {
+                const data = await fetchAPI('/api/status');
+                displayJSON('statusOutput', data);
+            } catch (e) { /* error already handled by fetchAPI's throw for display */ 
+                document.getElementById('statusOutput').textContent = `Error: ${e.message}`;
+            }
+        }
+        async function fetchConfigKeys() {
+             try {
+                const data = await fetchAPI('/api/config-keys');
+                displayJSON('configKeysOutput', data);
+            } catch (e) { 
+                document.getElementById('configKeysOutput').textContent = `Error: ${e.message}`;
+            }
+        }
+        async function validateProblemParams() {
+            const params = {
+                num_slots: parseInt(document.getElementById('validate_num_slots').value),
+                load: stringToArray(document.getElementById('validate_load').value),
+                solar: stringToArray(document.getElementById('validate_solar').value),
+                buy_price: stringToArray(document.getElementById('validate_buy_price').value),
+                sell_price: stringToArray(document.getElementById('validate_sell_price').value)
+            };
+            try {
+                const data = await fetchAPI('/api/validate-problem-params', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+                displayJSON('validationOutput', data);
+            } catch (e) {
+                document.getElementById('validationOutput').textContent = JSON.stringify({error: e.message}, null, 2);
+            }
+        }
+
+        // --- Initial Load ---
+        window.onload = () => {
+            fetchConfig(); // Load initial config into the form
+            setActiveProblemSource('server_config'); // Default to using server config for problem
+            // Add event listener for num_slots change in config tab to guide user
+            document.getElementById('config_num_slots').addEventListener('change', (event) => {
+                const numSlots = parseInt(event.target.value);
+                if (numSlots > 0) {
+                    const message = `Number of slots changed to ${numSlots}. Ensure Load, Solar, and Price arrays in this tab are updated to match this length if not using random data generation.`;
+                     displayStatusMessage('configStatus', message, false);
+                }
+            });
+            // Add event listener for num_slots change in manual problem definition
+             document.getElementById('manual_num_slots').addEventListener('change', (event) => {
+                const numSlots = parseInt(event.target.value);
+                const problemStatusEl = document.getElementById('problemStatus');
+                if (numSlots > 0) {
+                     problemStatusEl.textContent = `Manual number of slots changed to ${numSlots}. Please update corresponding array fields.`;
+                     problemStatusEl.className = 'status-message alert alert-info';
+                }
+            });
+        };
+    </script>
+</body>
+</html>

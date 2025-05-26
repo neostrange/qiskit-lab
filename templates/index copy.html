@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantum vs Classical Energy Optimizer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      padding: 2rem;
+      background-color: #f9f9f9;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    .result-box {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .loading {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 class="mb-4 text-center">Quantum vs Classical Energy Optimization</h1>
+
+  <div class="section">
+    <p>
+      This demo compares how a <strong>classical optimizer</strong> and a <strong>quantum optimizer</strong> solve an energy management problem.
+      It uses a simplified scenario involving battery usage, solar energy, and buying/selling electricity.
+    </p>
+    <p>
+      You can either use <strong>randomly generated data</strong> or enter values <strong>manually</strong>. Then run the optimization to compare results.
+    </p>
+    <button id="runBtn" class="btn btn-primary">Run Optimization (Random Data)</button>
+    <span class="loading" id="loadingText">Running optimization...</span>
+  </div>
+
+  <div class="section result-box" id="resultSection" style="display: none;">
+    <h4>Optimization Results</h4>
+    <div>
+      <h5>Input Data:</h5>
+      <pre id="inputData"></pre>
+    </div>
+    <div>
+      <h5>Classical Optimizer:</h5>
+      <pre id="classicalResult"></pre>
+    </div>
+    <div>
+      <h5>Quantum Optimizer:</h5>
+      <pre id="quantumResult"></pre>
+    </div>
+    <div>
+      <h5>Cost Difference:</h5>
+      <p id="differenceText"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:5000';
+
+document.getElementById('runBtn').addEventListener('click', () => {
+  const loadingText = document.getElementById('loadingText');
+  const resultSection = document.getElementById('resultSection');
+  loadingText.style.display = 'inline';
+  resultSection.style.display = 'none';
+
+  fetch(`${API_BASE}/api/run-optimization-saved`)
+    .then(res => res.json())
+    .then(data => {
+      loadingText.style.display = 'none';
+      if (data.error) {
+        alert("Error: " + data.error);
+        return;
+      }
+      document.getElementById('inputData').textContent = JSON.stringify(data.input, null, 2);
+      document.getElementById('classicalResult').textContent = JSON.stringify(data.classical, null, 2);
+      document.getElementById('quantumResult').textContent = JSON.stringify(data.quantum, null, 2);
+      document.getElementById('differenceText').textContent = `The cost difference between classical and quantum solutions is $${data.difference}`;
+      resultSection.style.display = 'block';
+    })
+    .catch(err => {
+      loadingText.style.display = 'none';
+      alert("Error: " + err);
+    });
+});
+</script>
+</body>
+</html>
