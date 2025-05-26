@@ -83,7 +83,7 @@ The project is structured to separate concerns, making it modular and easier to 
 * **`utils/problem_data_generator.py`**: Utility functions for creating synthetic load, solar, and price data.
 * **`templates/index.html`**: The single-page application (SPA) serving as the user interface, built with Bootstrap and JavaScript.
 * **`static/style.css`**: Custom CSS rules to enhance the appearance.
-* **`notebooks/` and `qiskit-lab/`**: These directories likely contain development notebooks and scripts used during the research and development phases, offering insights into the quantum computing aspects and problem formulation.
+* **`notebooks/` and `qiskit-lab/`**: These directories contain development notebooks and scripts used during the research and development phases, offering insights into the quantum computing aspects and problem formulation.
 
 ---
 
@@ -101,7 +101,7 @@ Follow these instructions to set up and run the project locally.
 1.  **Clone the repository:**
 
     ```bash
-    git clone [https://github.com/your-username/qiskit_demo.git](https://github.com/your-username/qiskit_demo.git) # Replace with your actual repo URL
+    git clone [https://github.com/your-username/qiskit_demo.git](https://github.com/neostrange/qiskit-lab.git) # Replace with your actual repo URL
     cd qiskit_demo
     ```
 
@@ -127,7 +127,7 @@ Follow these instructions to set up and run the project locally.
 1.  **Start the Flask backend server:**
 
     ```bash
-    python main.py
+    python app.py
     ```
     The server should start on `http://localhost:5000`.
 
